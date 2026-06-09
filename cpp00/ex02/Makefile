@@ -1,20 +1,24 @@
-NAME     = account
-CXX      = c++
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98
+NAME = Account
+CC = c++
+FLAGS = -Wall -Wextra -Werror -std=c++98
 
-SRCS     = Account.cpp tests.cpp
-OBJS     = $(SRCS:.cpp=.o)
+SRC = Account.cpp tests.cpp
+OBJ = $(SRC:.cpp=.o)
 
-$(NAME): $(OBJS)
-	$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
+all : $(NAME)
+
+$(NAME) : $(OBJ)
+	$(CC) $(OBJ) -o $(NAME)
 
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CC) $(FLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJS)
+	rm -f $(OBJ)
 
 fclean: clean
 	rm -f $(NAME)
 
-re: fclean $(NAME)
+re: fclean all
+
+.PHONY: all clean fclean re

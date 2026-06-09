@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   megaphone.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: halzamma <halzamma@student.42roma.it>      +#+  +:+       +#+        */
+/*   By: halzamma <halzamma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/03 20:55:19 by halzamma          #+#    #+#             */
-/*   Updated: 2026/06/03 20:55:19 by halzamma         ###   ########.fr       */
+/*   Updated: 2026/06/09 12:26:58 by halzamma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,11 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    // Loop through each argument
     for (int i = 1; i < argc; i++)
     {
-        std::string arg = argv[i];  // convert C string to C++ string
+        std::string arg = argv[i];
         for (int j = 0; j < (int)arg.size(); j++)
-            arg[j] = std::toupper(arg[j]);  // uppercase
+            arg[j] = std::toupper(arg[j]);
         std::cout << arg;
     }
     std::cout << std::endl;
