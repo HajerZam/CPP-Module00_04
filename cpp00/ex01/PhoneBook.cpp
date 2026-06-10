@@ -6,7 +6,7 @@
 /*   By: halzamma <halzamma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/03 21:05:16 by halzamma          #+#    #+#             */
-/*   Updated: 2026/06/09 13:19:04 by halzamma         ###   ########.fr       */
+/*   Updated: 2026/06/10 14:06:54 by halzamma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,8 @@
 #include <sstream>
 #include <cstdlib>
 
-//Constructor
 PhoneBook::PhoneBook() : _count(0), _oldest(0) {}
 
-//prints one cell of the table
 void PhoneBook::printColumn(std::string str) const
 {
 	if (str.size() > 10)
@@ -90,8 +88,8 @@ void PhoneBook::searchContact() const
 	int index;
 	std::cout << "Enter index: ";
 	std::getline(std::cin, input);
-	index = atoi(input.c_str());
-	if (input.empty() || index < 0 || index >= _count)
+	std::stringstream ss(input);
+	if (input.empty() || !(ss >> index) || index < 0 || index >= _count)
 	{
 		std::cout << "Invalid index." << std::endl;
 		return ;
