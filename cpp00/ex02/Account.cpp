@@ -6,7 +6,7 @@
 /*   By: halzamma <halzamma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/08 12:34:02 by halzamma          #+#    #+#             */
-/*   Updated: 2026/06/10 15:59:30 by halzamma         ###   ########.fr       */
+/*   Updated: 2026/06/10 16:53:53 by halzamma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,9 @@ void	Account::_displayTimestamp( void )
 	std::cout << "[" << buf << "] ";
 }
 
+/*	Constructor: initialize account with index, amount and counters,
+	update global stats, and display creation log with timestamp.*/
+
 Account::Account( int initial_deposit ) :
 	_accountIndex(_nbAccounts),
 	_amount(initial_deposit),
@@ -40,11 +43,15 @@ Account::Account( int initial_deposit ) :
 	std::cout << "index:" << _accountIndex << ";amount:" << _amount << ";created" << std::endl;
 }
 
+/* Destructor: display account closure with timestamp (no update of globals). */
+
 Account::~Account( void )
 {
 	_displayTimestamp();
 	std::cout << "index:" << _accountIndex << ";amount:" << _amount << ";closed" << std::endl;
 }
+
+/* Getters for the Account class */
 
 int Account::getNbAccounts( void )
 {
@@ -63,6 +70,8 @@ int Account::getNbWithdrawals( void )
 	return (_totalNbWithdrawals);
 }
 
+/* Display global account information with timestamp. */
+
 void Account::displayAccountsInfos( void )
 {
 	_displayTimestamp();
@@ -75,6 +84,9 @@ void Account::displayStatus( void ) const
 	std::cout << "index:" << _accountIndex << ";amount:" << _amount << ";deposits:" << _nbDeposits << ";withdrawals:" << _nbWithdrawals << std::endl;
 }
 
+/*	add amount to account and global totals, update counters,
+	and display operation log.*/
+
 void Account::makeDeposit( int deposit )
 {
 	_displayTimestamp();
@@ -85,6 +97,9 @@ void Account::makeDeposit( int deposit )
 	_totalNbDeposits++;
 	std::cout << ";amount:" << _amount << ";nb_deposits:" << _nbDeposits << std::endl;
 }
+
+/*	withdraw if possible, update account and global stats,
+	display result, and return success status.*/
 
 bool Account::makeWithdrawal( int withdrawal )
 {
@@ -102,6 +117,8 @@ bool Account::makeWithdrawal( int withdrawal )
 	std::cout << ";withdrawal:" << withdrawal << ";amount:" << _amount << ";nb_withdrawals:" << _nbWithdrawals << std::endl;
 	return (true);
 }
+
+/* another getter returns current account balance (read-only) */
 
 int Account::checkAmount( void ) const
 {
