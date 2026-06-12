@@ -318,7 +318,7 @@ int main(int argc, char **argv) {
 
 - Two classes: **PhoneBook** (array of 8 Contact) and **Contact** 
 
-- No dynamic allocation ( `new` forbidden here) 
+- No dynamic allocation ( `new` forbidden here so only option is a circular buffer) 
 
 - Commands: ADD / SEARCH / EXIT (anything else ignored) 
 
@@ -330,7 +330,36 @@ int main(int argc, char **argv) {
 
 - Read with `std::cin` , not scanf 
 
-- 9th contact replaces the oldest (circular index) 
+- 9th contact replaces the oldest (circular index)
+
+### How the 9th contact replaces the oldest?
+with a a circular buffer, it's just a fixed-size array where you reuse slots by wrapping around, instead of shifting things or allocating new memory.
+```
+Contact _contacts[8];  // fixed array, lives on the stack
+int     _oldest;       // tracks which slot to overwrite next
+```
+### How it works?
+So every time a contact is added:
+
+```
+cpp_contacts[_oldest] = newContact;
+_oldest = (_oldest + 1) % 8;
+```
+
+The % 8 wraps it back to 0 Whenever the _oldest hits 8. So the array behaves like a "cycle":
+```
+slots:   [ 0 ][ 1 ][ 2 ][ 3 ][ 4 ][ 5 ][ 6 ][ 7 ]
+          ↑                                        ↑
+       oldest                                    newest
+          |_________________wrap____________________↑
+```
+After 8 contacts, the 9th overwrites slot 0 (the oldest), the 10th overwrites slot 1, just index arithmetic.
+
+_count — how many contacts exist (caps at 8, used to validate SEARCH index and stop displaying garbage slots)
+_oldest — where to write next (keeps moving even after _count maxes out)
+
+Once you're full, _count stops incrementing but _oldest keeps spinning. That's why they need to be separate variables.
+
 
 ```
 // SEARCH column formatting example
