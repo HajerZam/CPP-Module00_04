@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: halzamma <halzamma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: halzamma <halzamma@student.42roma.it>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/18 11:58:21 by halzamma          #+#    #+#             */
-/*   Updated: 2026/06/18 12:12:41 by halzamma         ###   ########.fr       */
+/*   Updated: 2026/06/19 11:49:58 by halzamma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,15 +14,15 @@
 
 int main()
 {
-    Harl harl Harl();
+    Harl harl;
 
-    std::std::cout << "DEBUG:" << std::endl;
+    std::cout << "DEBUG:" << std::endl;
     harl.complain("DEBUG");
-    std::std::cout << "INFO:" << std::endl;
+    std::cout << "INFO:" << std::endl;
     harl.complain("INFO");
-    std::std::cout << "WARNING:" << std::endl;
+    std::cout << "WARNING:" << std::endl;
     harl.complain("WARNING");
-    std::std::cout << "ERROR:" << std::endl;
+    std::cout << "ERROR:" << std::endl;
     harl.complain("ERROR");
     
     return (0);

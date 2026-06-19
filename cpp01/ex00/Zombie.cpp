@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Zombie.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: halzamma <halzamma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: halzamma <halzamma@student.42roma.it>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/11 13:07:26 by halzamma          #+#    #+#             */
-/*   Updated: 2026/06/11 13:58:17 by halzamma         ###   ########.fr       */
+/*   Updated: 2026/06/18 22:19:00 by halzamma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ Zombie::Zombie()
 
 Zombie::~Zombie()
 {
+    std::cout << this->name << " is destroyed." << std::endl;
 }
 
 void Zombie::announce()

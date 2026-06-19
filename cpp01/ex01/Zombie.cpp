@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*    Zombie.cpp                                        :+:      :+:    :+:   */
+/*   Zombie.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: halzamma <halzamma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: halzamma <halzamma@student.42roma.it>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/17 11:45:04 by halzamma          #+#    #+#             */
-/*   Updated: 2026/06/17 11:55:36 by halzamma         ###   ########.fr       */
+/*   Updated: 2026/06/18 22:34:46 by halzamma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,5 +32,5 @@ void Zombie::setName(std::string name)
 
 void Zombie::announce()
 {
-	std::cout << this->name << " BraiiiiiiinnnzzzZ..." << std::endl;
+	std::cout << this->name << ": BraiiiiiiinnnzzzZ..." << std::endl;
 }

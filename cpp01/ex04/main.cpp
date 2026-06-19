@@ -3,18 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: halzamma <halzamma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: halzamma <halzamma@student.42roma.it>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/18 11:19:12 by halzamma          #+#    #+#             */
-/*   Updated: 2026/06/18 11:50:21 by halzamma         ###   ########.fr       */
+/*   Updated: 2026/06/19 11:15:07 by halzamma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <iostream>
+#include <string>
+#include <fstream>
+#include <sstream>
 
 int main(int argc, char **argv)
 {
-	// checking arguments
 	if (argc < 4)
 	{
 		std::cout << "usage: ./sed <filename> <s1> <s2>" << std::endl;
@@ -22,33 +24,25 @@ int main(int argc, char **argv)
 	}
 	std::string filename = argv[1];
 	std::string search = argv[2];
-	search = replaceNL(search);
 	std::string replace = argv[3];
-	replace = replaceNL(replace);
 
-	// oepning filestream
-	std::ifstream infile;
-	infile.open(filename.c_str());
-	if (infile.fail())
+	std::ifstream infile(filename.c_str());
+	if (!infile.is_open())
 	{
 		std::cout << "Error opening file!" << std::endl;
 		return (1);
 	}
-	std::ofstream outfile;
-	outfile.open((filename + ".replace").c_str());
-	if (outfile.fail())
+	std::ofstream outfile((filename + ".replace").c_str());
+	if (!outfile.is_open())
 	{
 		std::cout << "Error creating output file!" << std::endl;
 		return (1);
 	}
 
-
-	// reading file and replacing
 	std::stringstream buffer;
 	buffer << infile.rdbuf();
 	std::string content = buffer.str();
 
-	// replacing all occurrences of search with replace
 	if (search.empty())
 	{
 		outfile << content;
