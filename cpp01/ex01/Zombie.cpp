@@ -6,16 +6,14 @@
 /*   By: halzamma <halzamma@student.42roma.it>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/17 11:45:04 by halzamma          #+#    #+#             */
-/*   Updated: 2026/06/18 22:34:46 by halzamma         ###   ########.fr       */
+/*   Updated: 2026/06/22 11:43:04 by halzamma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Zombie.hpp"
 
-Zombie::Zombie(std::string name)
-{
-	this->name = name;
-}
+Zombie::Zombie(std::string name) : name(name)
+{}
 
 Zombie::Zombie()
 {}
