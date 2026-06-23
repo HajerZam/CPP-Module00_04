@@ -84,3 +84,106 @@ std::ostream &operator<<(std::ostream &out, const Fixed &fixed)
     out << fixed.toFloat();
     return out;
 }
+
+// Static member function that takes two references to Fixed-point numbers and returns a ref to smallest
+Fixed &Fixed::min(Fixed &a, Fixed &b)
+{
+    return (a < b) ? a : b;
+}
+
+// Static member function that takes two references to const Fixed-point numbers and returns a ref to smallest
+const Fixed &Fixed::min(const Fixed &a, const Fixed &b)
+{
+    return (a < b) ? a : b;
+}
+
+// Static member function that takes two references to Fixed-point numbers and returns a ref to largest
+Fixed &Fixed::max(Fixed &a, Fixed &b)
+{
+    return (a > b) ? a : b;
+}
+
+// Static member function that takes two references to const Fixed-point numbers and returns a ref to largest
+const Fixed &Fixed::max(const Fixed &a, const Fixed &b)
+{
+    return (a > b) ? a : b;
+}
+
+// Comparison operators: public overloaded member functions
+bool Fixed::operator>(const Fixed &other) const
+{
+    return _fixedPointValue > other._fixedPointValue;
+}
+
+bool Fixed::operator<(const Fixed &other) const
+{
+    return _fixedPointValue < other._fixedPointValue;
+}
+
+bool Fixed::operator>=(const Fixed &other) const
+{
+    return _fixedPointValue >= other._fixedPointValue;
+}
+
+bool Fixed::operator<=(const Fixed &other) const
+{
+    return _fixedPointValue <= other._fixedPointValue;
+}
+
+bool Fixed::operator==(const Fixed &other) const
+{
+    return _fixedPointValue == other._fixedPointValue;
+}
+
+bool Fixed::operator!=(const Fixed &other) const
+{
+    return _fixedPointValue != other._fixedPointValue;
+}
+
+// Arithmetic operators: public overloaded member functions
+Fixed Fixed::operator+(const Fixed &other) const
+{
+    return Fixed(this->toFloat() + other.toFloat());
+}
+
+Fixed Fixed::operator-(const Fixed &other) const
+{
+    return Fixed(this->toFloat() - other.toFloat());
+}
+
+Fixed Fixed::operator*(const Fixed &other) const
+{
+    return Fixed(this->toFloat() * other.toFloat());
+}
+
+Fixed Fixed::operator/(const Fixed &other) const
+{
+    return Fixed(this->toFloat() / other.toFloat());
+}
+
+// Increment/Decrement operators
+Fixed &Fixed::operator++(void) // Prefix increment
+{
+    ++_fixedPointValue;
+    return *this;
+}
+
+Fixed &Fixed::operator--(void) // Prefix decrement
+{
+    --_fixedPointValue;
+    return *this;
+}
+
+Fixed Fixed::operator++(int) // Postfix increment
+{
+    Fixed temp(*this);
+    ++_fixedPointValue;
+    return temp;
+}
+
+Fixed Fixed::operator--(int) // Postfix decrement
+{
+    Fixed temp(*this);
+    --_fixedPointValue;
+    return temp;
+}
