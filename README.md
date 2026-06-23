@@ -1,5 +1,4 @@
-## **42 — CPP Module 00-04** 
-
+# **42 — CPP Module 00-04** 
 <div align="center">
   <img src="https://i.imgur.com/gUzwHBa.jpeg" alt="cpp modules Banner" width="400">
 </div>
@@ -18,8 +17,9 @@
 </p>
 <p align="center">so here are notes for fellow confused students!</p>
 
-
 ## **General Rules & Eval Traps** 
+<div align="center">
+
 
 ```
 c++ -Wall -Wextra -Werror -std=c++98 *.cpp -o program
@@ -41,9 +41,9 @@ c++ -Wall -Wextra -Werror -std=c++98 *.cpp -o program
 **DEFENSE** Be ready to justify stack vs heap choices out loud — the evaluation sheet explicitly asks evaluators to check that "the student must justify their choices" for ex00's `randomChump` . 
 
 **INSTANT 0 / −42** Flags that end the evaluation immediately: Empty work · Incomplete work · Invalid compilation · Cheat · Crash · Forbidden function. Double-check your repo is clean before defense.
+</div>
 
-
-## CPP MODULE00 - NOTES
+# CPP MODULE00 - NOTES
 Namespaces · Classes · Member Functions · iostream · Init Lists · static · const 
 
 ## **Namespaces** 
@@ -359,7 +359,7 @@ std::cout << std::setw(10) << std::right << field << "|"
 I Truncation logic: if field.length() > 10, print field.substr(0, 9) + '.' 
 
 
-## CPP MODULE02 - NOTES
+# CPP MODULE01 - NOTES
 *Memory allocation, pointers to members,
 references and switch statements*
 
@@ -563,7 +563,7 @@ std::string content = buffer.str();
 
 
 
-## CPP MODULE02 - NOTES
+# CPP MODULE02 - NOTES
 *Ad-hoc polymorphism · Operator overloading · Orthodox Canonical Form*
 
 ---
