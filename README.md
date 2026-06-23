@@ -18,6 +18,31 @@
 </p>
 <p align="center">so here are notes for fellow confused students!</p>
 
+
+## **General Rules & Eval Traps** 
+
+```
+c++ -Wall -Wextra -Werror -std=c++98 *.cpp -o program
+```
+
+|**Forbidden**|**Penalty**|
+|---|---|
+|`printf`/`scanf`/`*alloc`/`free`|Grade 0|
+|`using namespace`or`friend`(anywhere)|Grade −42|
+|STL containers / algorithms (before Module 08–09)|Grade −42|
+|Function implementation in a header (non-template)|Grade 0|
+|Missing include guards|Grade 0|
+|C++11 / Boost features|Grade 0|
+
+
+
+**MEMORY** Leaks are checked live with `valgrind` or `leaks` during defense. Every `new` needs a matching `delete` ; every `new[]` a matching `delete[]` . 
+
+**DEFENSE** Be ready to justify stack vs heap choices out loud — the evaluation sheet explicitly asks evaluators to check that "the student must justify their choices" for ex00's `randomChump` . 
+
+**INSTANT 0 / −42** Flags that end the evaluation immediately: Empty work · Incomplete work · Invalid compilation · Cheat · Crash · Forbidden function. Double-check your repo is clean before defense.
+
+
 ## CPP MODULE00 - NOTES
 Namespaces · Classes · Member Functions · iostream · Init Lists · static · const 
 
@@ -368,8 +393,487 @@ std::cout << std::setw(10) << std::right << field << "|"
 
 I Truncation logic: if field.length() > 10, print field.substr(0, 9) + '.' 
 
-## **ex02 — The Job Of Your Dreams (optional)** 
 
-Recreate Account.cpp from Account.hpp + tests.cpp + the log file. Output must match the log exactly — timestamps excepted (they'll differ). Static members track totals across all Account instances. 
+## CPP MODULE02 - NOTES
+*Memory allocation, pointers to members,
+references and switch statements*
 
-I Destructor call order may differ between compilers/OS — reverse order is acceptable. 
+## **Stack vs Heap** 
+
+**Stack** objects are automatic — they're destroyed when execution leaves their scope. **Heap** objects are created with `new` and live until you explicitly `delete` them. 
+
+```
+Zombie *z = new Zombie("Rick");   // heap: outlives this function
+z->announce();
+delete z;                         // you must free it yourself
+Zombie z2("Carl");                // stack: destroyed automatically
+z2.announce();                    // at the closing brace, dtor runs
+```
+
+## **newZombie() vs randomChump()** 
+
+- `newZombie()` returns a `Zombie*` that must outlive the function call → **heap** . 
+
+- `randomChump()` only needs the zombie inside the function → **stack** works fine, and cleans itself up. 
+
+**MUST** Every `new` needs a matching `delete` . Every `new[]` needs a matching `delete[]` — mixing the two is undefined behaviour, not just a leak. 
+
+## **References vs Pointers** 
+
+||**Pointer**|**Reference**|
+|---|---|---|
+|Can be NULL|Yes|No — must always refer to a valid object|
+|Can be reassigned|Yes|No — bound for life at creation|
+|Must be initialised at declaration|No|Yes|
+|Access syntax|`*ptr`|used directly, no operator|
+
+
+
+```
+std::string str = "HI THIS IS BRAIN";
+std::string *stringPTR = &str;
+std::string &stringREF = str;
+```
+
+```
+std::cout << &str << std::endl;        // same address
+std::cout << stringPTR << std::endl;   // same address
+std::cout << &stringREF << std::endl;  // same address, too
+```
+
+**NOTE** A reference isn't a new object — it's just another name for the same memory. That's why `&stringREF` prints the exact same address as `&str` . 
+
+## **Reference Members & Initializer Lists** 
+
+A reference member can't be assigned in the constructor body — it must be bound in the **initializer list** , at construction time, since references can't be re-pointed afterward. 
+
+```
+class HumanA {
+    Weapon &weapon;
+public:
+    HumanA(std::string name, Weapon &weapon)
+        : name(name), weapon(weapon) {}
+//                       ^ NOT &weapon — weapon is already a reference
+};
+```
+
+**COMMON BUG** `weapon(&weapon)` in the init list is a classic mix-up — that syntax is for _pointer_ members, not reference members. 
+
+|**Class**|**Member type**|**Why**|
+|---|---|---|
+|HumanA|`Weapon&`|Always armed — weapon set once, at construction|
+|HumanB|`Weapon*`|May start unarmed;`setWeapon()`assigns it later, can be NULL|
+
+
+
+## **Pointers to Member Functions** 
+
+In C, a function-pointer table looks like `void (*funcs[4])(void) = {f1, f2, f3, f4};` then `funcs[i]();` . In C++, a _member_ function pointer needs the class baked into its type, because calling it requires an object ( `this` ) to act on. 
+
+```
+void Harl::complain(std::string level)
+{
+    std::string levels[4] = {"DEBUG", "INFO", "WARNING", "ERROR"};
+    void (Harl::*funcs[4])(void) = {&Harl::debug, &Harl::info,
+                                     &Harl::warning, &Harl::error};
+    for (int i = 0; i < 4; i++)
+        if (level == levels[i])
+            return ((this->*funcs[i])());   // ->* calls a member-fn pointer
+    std::cout << "Invalid level!" << std::endl;
+}
+```
+
+**WON'T COMPILE** `switch` cannot operate on `std::string` — only on integral or enum types. A string-keyed switch isn't a style mistake, it's a compile error. Save `switch` for ex06. 
+
+## **Switch Statements** (ex06) 
+
+`switch` only accepts integral/enum values, needs a `default` case, and falls through to the next case unless you `break;` . 
+
+```
+switch (level)
+{
+    case DEBUG:
+        std::cout << debugMsg << std::endl;
+// no break: DEBUG also prints INFO, WARNING, ERROR below
+    case INFO:
+        std::cout << infoMsg << std::endl;
+    case WARNING:
+        std::cout << warnMsg << std::endl;
+        break;
+    case ERROR:
+        std::cout << errorMsg << std::endl;
+        break;
+    default:
+        std::cout << "[ Probably complaining about insignificant problems ]" << std::endl;
+}
+```
+
+**TIP** ex06 wants "this level and everything louder" (DEBUG < INFO < WARNING < ERROR). Intentionally _omitting_ `break` between the quieter levels is the natural way to get that cascade — just make sure ERROR still breaks (or is last). 
+
+## **File I/O — ifstream / ofstream** (ex04) 
+
+|**C**|**C++**|
+|---|---|
+|`FILE *fp = fopen(path, "r")`|`std::ifstream infile(path)`|
+|`FILE *fp = fopen(path, "w")`|`std::ofstream outfile(path)`|
+|`if (!fp)`|`if (!infile.is_open())`|
+|`fclose(fp)`|automatic when the stream goes out of scope (RAII)|
+
+
+
+```
+std::ifstream infile(filename.c_str());   // .c_str(): C++98 ctor wants const char*
+if (!infile.is_open()) { /* error */ }
+```
+
+```
+std::stringstream buffer;
+buffer << infile.rdbuf();                // slurp whole file into one string
+std::string content = buffer.str();
+```
+
+**FORBIDDEN** `std::string::replace` is banned in ex04 — build the replacement using `substr()` + `find()` instead. 
+
+**TIP** `.c_str()` is required when passing a `std::string` to the `ifstream` / `ofstream` constructor in C++98 — the `std::string` overload doesn't exist until C++11.
+
+## **Exercise Quick Reference** 
+
+## **ex00 — BraiiiiiiinnnzzzZ** 
+
+- Zombie has a private `name` ; `announce()` prints `<name>: BraiiiiiiinnnzzzZ...` — don't forget the colon. 
+
+- Destructor **must** print a debug message including the zombie's name. 
+
+- `newZombie(name)` → heap, returns `Zombie*` . 
+
+- `randomChump(name)` → stack, destroyed automatically. 
+
+## **ex01 — Moar brainz!** 
+
+- Zombie needs a **default constructor** — you allocate first with `new[]` , then set names after. 
+
+- `zombieHorde(N, name)` : one single `new Zombie[N]` allocation, not a loop of individual `new` . 
+
+- Delete all of them together at the end with one `delete[]` . 
+
+## **ex02 — HI THIS IS BRAIN** 
+
+- One string, one pointer to it, one reference to it. 
+
+- Print all three addresses first, then all three values. 
+
+- All three addresses come out identical — that's the entire point of the exercise. 
+
+## **ex03 — Unnecessary violence** 
+
+- Weapon: private `type` , `getType()` returns `const std::string&` , `setType()` sets it. 
+
+- HumanA: `Weapon&` member, bound in the initializer list, always armed. 
+
+- HumanB: `Weapon*` member, `setWeapon()` assigns it later, can stay unset. 
+
+## **ex04 — Sed is for losers** 
+
+- `ifstream` to read, `ofstream` to write to `<filename>.replace` . 
+
+- `std::string::replace` is forbidden — use `substr` / `find` . 
+
+- Handle: missing file, missing args, empty `s1` , `s1` not found in the file. 
+
+## **ex05 — Harl 2.0** 
+
+- Harl: 4 private functions ( `debug` / `info` / `warning` / `error` ) + 1 public `complain(std::string)` . 
+
+- `complain()` must dispatch through a pointer-to-member-function array — no `if` / `else if` chain allowed. 
+
+- Any implementation is valid as long as it avoids the if/else chain — exact message wording doesn't matter. 
+
+**ex06 — Harl filter** (optional — you can pass the module without it) 
+
+- Executable must be named `harlFilter` , exactly. 
+
+- Takes one level argument, prints that level and everything louder (DEBUG < INFO < WARNING < ERROR). 
+
+- Must use a `switch` statement with a `default` case — no if/else chain here either. 
+
+
+
+## CPP MODULE02 - NOTES
+*Ad-hoc polymorphism · Operator overloading · Orthodox Canonical Form*
+
+---
+
+## — THE THEORY
+
+### 1.1 — I come from C. What changed?
+
+In C, if I want to add two things, I write one function per type: `add_int()`, `add_float()`, `add_vector()`. The function name is unique. The compiler matches the name exactly and goes there. Simple. Rigid.
+
+In C++, I can write three functions all named `add()`, each taking different parameter types. The compiler looks at what I passed in, figures out which version I meant, and calls it. This is called **function overloading** — and it is the foundation of everything in Module 02.
+
+**C — one name, one function**
+```c
+int add_int(int a, int b)
+float add_float(float a, float b)
+// I choose the name myself. No ambiguity. No magic.
+```
+
+**C++ — one name, many functions**
+```cpp
+int add(int a, int b)
+float add(float a, float b)
+// Compiler chooses for me, based on the types I pass in.
+```
+
+---
+
+### 1.2 — Ad-hoc polymorphism
+
+*Ad-hoc* means "for this specific case" in Latin. So ad-hoc polymorphism = "I write the same function name for specific cases and the compiler picks the right one."
+
+This is different from runtime polymorphism (virtual functions, inheritance). Ad-hoc polymorphism happens entirely **at compile time**. The compiler reads my code, sees the types, and decides. By the time the program runs, the choice is already baked in.
+
+**What does the compiler actually do?**
+When it sees `a + b`, it looks at the types of `a` and `b`. If they are `int`s, it uses the int version. If they are my `Fixed` objects, it looks for a function called `operator+` that takes `Fixed` parameters. If it finds one, great. If not, compile error. This lookup process is called **overload resolution**.
+
+---
+
+### 1.3 — Operator overloading
+
+In C, operators like `+`, `-`, `==`, `<<` only work on built-in types. I can't write `myStruct + myStruct` — I have to write a function and call it explicitly.
+
+In C++, operators are just functions with special names. `a + b` is literally the same as calling `operator+(a, b)`. So I can write my own version of `operator+` for my class, and suddenly `+` works on my objects.
+
+```cpp
+// These two lines mean EXACTLY the same thing to the compiler:
+Fixed result = a + b;
+Fixed result = a.operator+(b);
+
+// And the insertion operator works the same way:
+std::cout << a;
+operator<<(std::cout, a); // same thing
+```
+
+**Why was this invented?** Readability. Writing `a + b` is much clearer than `fixed_add(a, b)`, especially when expressions get complex like `Fixed::max(a + b, c * d)`.
+
+---
+
+### 1.4 — The Orthodox Canonical Form
+
+In C, a struct is just memory. Copy it with `memcpy`, pass it around, nobody cares.
+
+In C++, a class can **own resources** — heap memory, file handles, connections. If I copy the class carelessly, two objects point to the same memory, and when one dies it takes the other's data with it.
+
+The Orthodox Canonical Form is the contract I make with the compiler: *"I promise I handle copying, assignment, and destruction correctly."* From Module 02 onwards, every class must have these 4 things:
+
+| Function | When it runs | What it does |
+|---|---|---|
+| `Fixed()` | `Fixed a;` | Creates a brand new object from scratch |
+| `Fixed(const Fixed &other)` | `Fixed b(a);` / `Fixed b = a;` | Creates a new object as a copy of an existing one |
+| `Fixed &operator=(const Fixed &other)` | `a = b;` (a already exists) | Overwrites an existing object with values from another |
+| `~Fixed()` | `}` end of scope / `delete obj;` | Cleans up when the object dies |
+
+**Copy constructor vs copy assignment — what is the difference?**
+- **Copy constructor:** the object does not exist yet. I am *building* it from another.
+- **Copy assignment:** the object already exists. I am *replacing* its contents.
+
+The compiler knows which one to call based on context. I just need both.
+
+---
+
+### 1.5 — Fixed-point numbers
+
+Integers are fast but cannot represent `1.5`. Floats can represent `1.5` but are imprecise and slow on hardware without an FPU (graphics chips, embedded systems).
+
+**Fixed-point** is the middle ground: I store an integer, but I agree that the last 8 bits represent the fractional part. So the number is always `raw_value / 2^8 = raw_value / 256`.
+
+```cpp
+// To store 1.5:
+int raw = 384;          // 1.5 × 256 = 384
+float val = raw / 256.0f; // = 1.5 (reading back)
+
+// Storing 42.42f:
+int raw = roundf(42.42f * 256); // = roundf(10859.52) = 10860
+float back = 10860 / 256.0f;   // = 42.4219 (tiny precision loss, expected)
+```
+
+---
+
+## — THE CODE
+
+### 2.1 — Fixed.hpp
+
+```cpp
+#pragma once
+#include <iostream>
+#include <cmath>
+
+class Fixed {
+private:
+    int _fixedPointValue;
+    static const int _fractionalBits = 8;
+
+public:
+    Fixed();
+    Fixed(const int value);
+    Fixed(const float value);
+    Fixed(const Fixed &other);
+    ~Fixed();
+
+    Fixed &operator=(const Fixed &other);
+
+    int   getRawBits(void) const;
+    void  setRawBits(int const raw);
+    float toFloat(void) const;
+    int   toInt(void) const;
+
+    bool operator>(const Fixed &other) const;
+    // ... more operators ...
+
+    static Fixed       &min(Fixed &a, Fixed &b);
+    static const Fixed &min(const Fixed &a, const Fixed &b);
+};
+
+std::ostream &operator<<(std::ostream &out, const Fixed &f);
+```
+
+| Line | What it means |
+|---|---|
+| `#pragma once` | Include guard — stops the header from being pasted twice. Without this: duplicate declaration errors. |
+| `static const int _fractionalBits = 8` | `static`: belongs to the class itself, not any individual object. `const`: never changes. |
+| `Fixed(const Fixed &other)` | Copy constructor. Takes a `const` reference — not a copy — to avoid infinite recursion. |
+| `Fixed &operator=(const Fixed &other)` | Copy assignment. Returns `*this` by reference so I can chain: `a = b = c;` |
+| `int getRawBits(void) const` | Trailing `const`: this function promises not to modify the object. Callable on `const Fixed` objects. |
+| `static Fixed &min(...)` | `static` member function: called as `Fixed::min(a, b)`, no object needed. Returns a reference — not a copy — so I get the actual `a` or `b` back. |
+| `operator<<` outside class | Not a member of `Fixed` because the left side is `std::ostream`, not `Fixed`. Free function taking both. |
+
+---
+
+### 2.2 — Constructors
+
+```cpp
+Fixed::Fixed() : _fixedPointValue(0) {
+    std::cout << "Default constructor called" << std::endl;
+}
+
+Fixed::Fixed(const int value) : _fixedPointValue(value << _fractionalBits) {
+    std::cout << "Int constructor called" << std::endl;
+}
+
+Fixed::Fixed(const float value)
+    : _fixedPointValue(roundf(value * (1 << _fractionalBits))) {
+    std::cout << "Float constructor called" << std::endl;
+}
+
+Fixed::Fixed(const Fixed &other) {
+    std::cout << "Copy constructor called" << std::endl;
+    *this = other; // calls operator= which does the actual copy
+}
+```
+
+- `: _fixedPointValue(0)` — **initializer list**: sets the member variable *before* the constructor body runs. More efficient than setting it inside the body, and required for `const` members.
+- `value << _fractionalBits` — left bit shift by 8 = multiply by 256. `int 10` → raw value `2560`. Divide back by 256 → `10`.
+- `roundf(value * 256)` — multiply the float by 256 to scale it up, then round to nearest int. `42.42 × 256 = 10859.52` → rounds to `10860`.
+
+---
+
+### 2.3 — Copy assignment operator
+
+```cpp
+Fixed &Fixed::operator=(const Fixed &other) {
+    std::cout << "Copy assignment operator called" << std::endl;
+    if (this != &other)             // self-assignment guard
+        _fixedPointValue = other.getRawBits();
+    return *this;                   // return the object itself
+}
+```
+
+- `this` is a pointer to the current object. `*this` is the object itself.
+- `if (this != &other)` — guard against `a = a`. Without this, I'd overwrite my own data before reading it.
+- `return *this` — returning a reference to myself allows chaining: `a = b = c` works because `b = c` returns `b`, then `a = b` runs.
+
+---
+
+### 2.4 — Arithmetic operators
+
+```cpp
+Fixed Fixed::operator+(const Fixed &other) const {
+    return Fixed(this->toFloat() + other.toFloat());
+}
+
+Fixed Fixed::operator*(const Fixed &other) const {
+    return Fixed(this->toFloat() * other.toFloat());
+}
+// same pattern for - and /
+```
+
+I convert both operands to float, do the math in float, then convert the result back into a `Fixed`. This creates a temporary `Fixed` object which gets returned.
+
+**Why float and not raw int math?** Because multiplying raw fixed-point values directly gives wrong results — the scale factor would be squared. Float math sidesteps this cleanly.
+
+---
+
+### 2.5 — Increment/decrement operators
+
+```cpp
+Fixed &Fixed::operator++(void) {   // PRE-increment: ++a
+    ++_fixedPointValue;
+    return *this;                  // return AFTER incrementing
+}
+
+Fixed Fixed::operator++(int) {     // POST-increment: a++
+    Fixed temp(*this);             // save current state
+    ++_fixedPointValue;            // increment
+    return temp;                   // return BEFORE state
+}
+```
+
+- The `(int)` parameter is a **dummy** — it has no value. The compiler uses it only to distinguish post-increment from pre-increment.
+- `++a` returns a reference: increment then return myself. No copy needed.
+- `a++` returns a copy: save state first, increment, return the old copy. This is why post-increment is slightly slower.
+- Adding `1` to raw value = the smallest epsilon, because raw `1` = `1/256` in actual value.
+
+---
+
+### 2.6 — Comparison operators and min/max
+
+```cpp
+bool Fixed::operator>(const Fixed &other) const {
+    return _fixedPointValue > other._fixedPointValue;
+}
+// same pattern for <, >=, <=, ==, !=
+
+static Fixed &Fixed::min(Fixed &a, Fixed &b) {
+    return (a < b) ? a : b;
+}
+
+static const Fixed &Fixed::min(const Fixed &a, const Fixed &b) {
+    return (a < b) ? a : b;
+}
+```
+
+- **Why compare raw values directly?** The scale factor (256) is the same for both objects. Larger raw value = larger number. No float conversion needed.
+- **Why two versions of min/max?** One takes non-const references (mutable objects), one takes const references (const objects). The compiler picks the right one automatically.
+
+---
+
+### 2.7 — toFloat, toInt, operator<<
+
+```cpp
+float Fixed::toFloat(void) const {
+    return static_cast<float>(_fixedPointValue) / (1 << _fractionalBits);
+}
+
+int Fixed::toInt(void) const {
+    return _fixedPointValue >> _fractionalBits;
+}
+
+std::ostream &operator<<(std::ostream &out, const Fixed &fixed) {
+    out << fixed.toFloat();
+    return out;
+}
+```
+
+- `static_cast<float>`: must cast to float *before* dividing, otherwise integer division truncates everything (`10860 / 256 = 42`, not `42.42`).
+- `>> _fractionalBits`: right shift by 8 = divide by 256 and discard the fractional part.
+- `operator<<` returns the stream: enables chaining `std::cout << a << b << std::endl`.
