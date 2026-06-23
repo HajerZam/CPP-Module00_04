@@ -282,41 +282,6 @@ class ClassName {
 
 Convention: use the filename in caps with dots replaced by underscores, e.g. `PHONEBOOK_HPP` . 
 
-## **General Rules & Eval Traps** 
-
-## **Compilation** 
-
-```
-c++ -Wall -Wextra -Werror -std=c++98 *.cpp -o program
-```
-
-## **Forbidden** → **grade 0 or** − **42** 
-
-|**Forbidden**|**Penalty**|
-|---|---|
-|`printf / scanf / malloc /`<br>`free / alloc`|Grade 0|
-|`using namespace`or`friend`<br>(in headers or at all)|Grade−42|
-|STL containers/algorithms before<br>Module 08|Grade−42|
-|Function implementation in a<br>header (non-template)|Grade 0|
-|Missing include guards|Grade 0|
-|C++11 / Boost features|Grade 0|
-
-
-
-## **Memory** 
-
-II Memory leaks are checked with `valgrind` or `leaks` . Every `new` must have a matching `delete` . 
-
-## **File naming** 
-
-- Class names: **UpperCamelCase** (e.g. PhoneBook, BrickWall) 
-
-- Files named after the class: BrickWall.hpp / BrickWall.cpp 
-
-- Exercise directories: ex00/, ex01/, ex02/ 
-
-- Each header must be independently includable (self-contained) 
-
 ## **Exercise Quick Reference** 
 
 ## **ex00 — Megaphone** 
