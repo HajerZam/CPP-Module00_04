@@ -842,3 +842,8 @@ std::ostream &operator<<(std::ostream &out, const Fixed &fixed) {
 - `static_cast<float>`: must cast to float *before* dividing, otherwise integer division truncates everything (`10860 / 256 = 42`, not `42.42`).
 - `>> _fractionalBits`: right shift by 8 = divide by 256 and discard the fractional part.
 - `operator<<` returns the stream: enables chaining `std::cout << a << b << std::endl`.
+
+
+# CPP MODULE03 - NOTES
+*Inheritance*
+
