@@ -3,15 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   FragTrap.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: halzamma <halzamma@student.42roma.it>      +#+  +:+       +#+        */
+/*   By: halzamma <halzamma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/29 15:13:40 by halzamma          #+#    #+#             */
-/*   Updated: 2026/06/29 15:13:40 by halzamma         ###   ########.fr       */
+/*   Updated: 2026/06/30 13:43:53 by halzamma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "FragTrap.hpp"
 
+// ORTHODOX CANONICAL FORM
 FragTrap::FragTrap(std::string name) : ClapTrap(name)
 {
     _hit_points = 100;
@@ -36,6 +37,9 @@ FragTrap &FragTrap::operator=(const FragTrap &assign)
     return *this;
 }
 
+
+// Overridden attack(): FragTrap's version, uses inherited _name,
+// _attack_damage, _energy_points just like ScavTrap's does
 void FragTrap::attack(const std::string &target)
 {
     if (!haveEnergy())

@@ -3,15 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   ScavTrap.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: halzamma <halzamma@student.42roma.it>      +#+  +:+       +#+        */
+/*   By: halzamma <halzamma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/29 14:48:15 by halzamma          #+#    #+#             */
-/*   Updated: 2026/06/29 14:48:15 by halzamma         ###   ########.fr       */
+/*   Updated: 2026/06/30 13:40:09 by halzamma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ScavTrap.hpp"
 
+// ORTHODOX CANONICAL FORM
 ScavTrap::ScavTrap(std::string name) : ClapTrap(name)
 {
     _hit_points = 100;
@@ -25,6 +26,20 @@ ScavTrap::~ScavTrap()
     std::cout << "ScavTrap: Destructor called" << std::endl;
 }
 
+ScavTrap::ScavTrap(const ScavTrap &copy) : ClapTrap(copy)
+{
+    std::cout << "ScavTrap: Copy Constructor called" << std::endl;
+}
+
+ScavTrap &ScavTrap::operator=(const ScavTrap &assign)
+{
+    ClapTrap::operator=(assign);
+    std::cout << "ScavTrap: Assignment operator called" << std::endl;
+    return *this;
+}
+
+// Overridden attack(): note this version only checks haveEnergy()
+
 void ScavTrap::attack(const std::string &target)
 {
 	if (!haveEnergy())
@@ -36,6 +51,7 @@ void ScavTrap::attack(const std::string &target)
 	_energy_points -= 1;
 }
 
+// ScavTrap-only ability. No equivalent exists in ClapTrap or FragTrap
 void ScavTrap::guardGate()
 {
     std::cout << "ScavTrap: " << _name << " is now in Gate keeper mode." << std::endl;

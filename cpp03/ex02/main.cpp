@@ -3,38 +3,38 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: halzamma <halzamma@student.42roma.it>      +#+  +:+       +#+        */
+/*   By: halzamma <halzamma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/29 12:09:07 by halzamma          #+#    #+#             */
-/*   Updated: 2026/06/29 12:09:07 by halzamma         ###   ########.fr       */
+/*   Updated: 2026/06/30 13:53:47 by halzamma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "FragTrap.hpp"
 
 int main() {
-	/*ClapTrap    _kris("kris");
-	ClapTrap    _susie("susie");
+	/*ClapTrap    Kris("kris");
+	ClapTrap    Susie("susie");
 
 	for (size_t i = 0; i < 6; i++)
 	{
-		_kris.attack("darkner");
+		Kris.attack("darkner");
 	}
-	_kris.takeDamage(125);
+	Kris.takeDamage(125);
 	std::cout << std::endl;
 
 	for (size_t i = 0; i < 12; i++)
 	{
-		_susie.takeDamage(1);
-		_susie.beRepaired(1);
+		Susie.takeDamage(1);
+		Susie.beRepaired(1);
 	}*/
 
-	/*ScavTrap _lancer("Lancer");
-    _lancer.attack("Kris");
-    _lancer.guardGate();*/
+	/*ScavTrap Lancer("Lancer");
+    Lancer.attack("Kris");
+    Lancer.guardGate();*/
 	
-	FragTrap _ralsei("Ralsei");
-    _ralsei.attack("Lancer");
-    _ralsei.highFivesGuys();
+	FragTrap Ralsei("Ralsei");
+    Ralsei.attack("Lancer");
+    Ralsei.highFivesGuys();
 	return (0);
 }

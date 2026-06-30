@@ -3,30 +3,30 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: halzamma <halzamma@student.42roma.it>      +#+  +:+       +#+        */
+/*   By: halzamma <halzamma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/29 12:09:07 by halzamma          #+#    #+#             */
-/*   Updated: 2026/06/29 12:09:07 by halzamma         ###   ########.fr       */
+/*   Updated: 2026/06/30 13:54:47 by halzamma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ClapTrap.hpp"
 
 int main() {
-	ClapTrap    _kris("kris");
-	ClapTrap    _susie("susie");
+	ClapTrap    Kris("kris");
+	ClapTrap    Susie("Susie");
 
 	for (size_t i = 0; i < 6; i++)
 	{
-		_kris.attack("darkner");
+		Kris.attack("darkner");
 	}
-	_kris.takeDamage(125);
+	Kris.takeDamage(125);
 	std::cout << std::endl;
 
 	for (size_t i = 0; i < 12; i++)
 	{
-		_susie.takeDamage(1);
-		_susie.beRepaired(1);
+		Susie.takeDamage(1);
+		Susie.beRepaired(1);
 	}
 	return (0);
 }
