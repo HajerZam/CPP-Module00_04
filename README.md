@@ -846,4 +846,168 @@ std::ostream &operator<<(std::ostream &out, const Fixed &fixed) {
 
 # CPP MODULE03 - NOTES
 *Inheritance*
+---
 
+## 1. What even IS inheritance?
+
+**The honest one-sentence explanation:**
+Inheritance lets me write a new class that automatically gets everything an existing class already has — all its variables, all its functions — and then I can add extra stuff on top, or change specific things.
+
+In C I had to copy-paste structs and manually pass pointers everywhere. In C++ I just say "ScavTrap is a ClapTrap" and it works.
+
+### A comparison that makes sense to me
+
+| C way | C++ inheritance way |
+|---|---|
+| I make a t_robot struct with name, hp, energy. Then I make a t_scavrobot struct and copy ALL the same fields into it again plus new ones. | I make a ClapTrap class with name, hp, energy. Then ScavTrap just says `: public ClapTrap` and it HAS all of those automatically. |
+| If I fix a bug in t_robot I have to fix it in t_scavrobot too. | If I fix a bug in ClapTrap, ScavTrap gets the fix for free. |
+
+---
+
+## 2. What actually happens in the compiler?
+
+When the compiler sees `ScavTrap : public ClapTrap`, it thinks:
+
+- ScavTrap objects need memory space for ALL of ClapTrap's variables PLUS ScavTrap's own.
+- When I construct a ScavTrap, it first runs ClapTrap's constructor, then ScavTrap's.
+- When it destructs, reverse order: ScavTrap destructor first, then ClapTrap.
+- If ScavTrap has its own attack(), that overrides ClapTrap's version for ScavTrap objects.
+
+### Memory layout of a ScavTrap object
+
+```
+┌─────────────────────────────────┐
+│  ScavTrap object in memory      │
+│  ┌───────────────────────────┐  │
+│  │  ClapTrap part            │  │
+│  │   _name                   │  │
+│  │   _hit_points             │  │
+│  │   _energy_points          │  │
+│  │   _attack_damage          │  │
+│  └───────────────────────────┘  │
+│  (ScavTrap has no extra fields) │
+└─────────────────────────────────┘
+```
+
+ScavTrap has no new attributes — it just reuses ClapTrap's and sets them to different values.
+
+---
+
+## 3. Constructor & Destructor chaining — the ORDER matters!
+
+**When I write:** `ScavTrap lancer("Lancer");`
+
+**What runs, in this exact order:**
+1. `ClapTrap::ClapTrap("Lancer")` ← the PARENT builds first
+2. `ScavTrap::ScavTrap("Lancer")` ← then the CHILD finishes
+
+**When lancer goes out of scope:**
+1. `ScavTrap::~ScavTrap()` ← CHILD destructs first
+2. `ClapTrap::~ClapTrap()` ← then PARENT cleans up
+
+> Why reversed? Because the child was built ON TOP of the parent. When demolishing a building you remove the top floors first.
+
+---
+
+## 4. private vs protected — why I had to change it
+
+| private | protected | public |
+|---|---|---|
+| Only THIS class can see it. ScavTrap CANNOT access it even though it inherits. | This class AND any child class can see it. ScavTrap CAN access it. ✓ | Everyone can see it from outside. Used for functions I want to call in main(). |
+| `_name` in ClapTrap originally | `_name` after I changed it so ScavTrap can use `_name`, `_hit_points` etc. | `attack()`, `takeDamage()`, `beRepaired()` |
+
+---
+
+## 5. ClapTrap.hpp — line by line
+
+**`#pragma once`**
+Include guard — if this file gets included twice by accident, the compiler ignores the second time. Replaces the old `#ifndef` guard pattern.
+
+**`#include <iostream>` / `#include <string>`**
+I need `std::cout` (from iostream) and `std::string` (from string). These are the C++ versions of stdio.h and string.h.
+
+**`class ClapTrap {`**
+Declares a new class called ClapTrap. A class is like a struct in C but with functions built in and access control (private/protected/public).
+
+**`protected:`**
+Everything below this line is accessible by ClapTrap AND any class that inherits from it (like ScavTrap, FragTrap). NOT accessible from main().
+
+**`std::string _name; int _hit_points; int _energy_points; int _attack_damage;`**
+The robot's data. I use `_underscore` prefix to visually separate member variables from local variables. `std::string` is C++'s built-in text type — no char arrays, no malloc.
+
+**`bool haveEnergy(); bool isAlive();`**
+Helper functions also protected. Only ClapTrap and its children can call these. They check internal state — no need to expose them publicly.
+
+**`public:`**
+Everything below is accessible from anywhere, including main(). These are the functions the outside world is allowed to call.
+
+**`void attack(const std::string &target);`**
+The `&` means "reference" — like a pointer but cleaner syntax. `const` means I promise not to modify target. This avoids copying the entire string.
+
+**`ClapTrap(std::string name);`**
+Parametrized constructor — called when I write `ClapTrap c("name");`. This is the one that actually sets up the robot.
+
+**`ClapTrap(const ClapTrap &copy);`**
+Copy constructor — called when I write `ClapTrap b = a;` or pass a ClapTrap by value to a function. Orthodox Canonical Form requires this.
+
+**`~ClapTrap();`**
+Destructor — called automatically when the object goes out of scope or gets deleted. The `~` means "un-constructor". I print a message here so peer evaluators can see it fires.
+
+**`ClapTrap &operator=(const ClapTrap &assign);`**
+Assignment operator — called when I write `a = b;` AFTER both are already constructed. Returns `*this` so I can chain assignments. Orthodox Canonical Form requires this.
+
+**`};`**
+End of class. The semicolon is REQUIRED after a class definition — easy to forget, compiler cries.
+
+---
+
+## 6. ClapTrap.cpp — the juicy implementation
+
+**`ClapTrap::ClapTrap(std::string name) : _name(name)`**
+The `::` is the scope operator — it means "this attack() belongs to ClapTrap, not some random global function". The `: _name(name)` part is an initializer list — it sets `_name` BEFORE the constructor body runs. Faster and cleaner than `_name = name` inside `{}`.
+
+**`_hit_points = 10; _energy_points = 10; _attack_damage = 0;`**
+Setting the default stats inside the constructor body. I could also put these in the initializer list but this reads more clearly for the exercises.
+
+**`std::cout << "Default Constructor called" << std::endl;`**
+The `<<` operator is "stream insertion" — I'm inserting text into cout (the terminal output stream). `std::endl` flushes the stream and adds a newline. I could use `'\n'` instead (faster) but endl is fine here.
+
+**`ClapTrap::ClapTrap(const ClapTrap &copy) { *this = copy; }`**
+`*this` dereferences the `this` pointer — this is a pointer to the current object. So `*this = copy` calls my assignment operator on myself, copying all fields. This avoids rewriting copy logic twice.
+
+**`ClapTrap &ClapTrap::operator=(const ClapTrap &assign) { this->_name = assign._name; ... return *this; }`**
+The assignment operator copies field by field. I access the other object's private fields because I'm inside the same class. `return *this` returns a reference to myself — this allows chaining like `a = b = c`.
+
+**`if (!isAlive()) ... else if (!haveEnergy()) ...`**
+Guard clauses. I check if the robot is dead or out of energy before doing anything. The `!` means NOT. This pattern reads as "if not alive, bail out".
+
+**`_energy_points -= 1;`**
+Both attack() and beRepaired() cost 1 energy. I subtract AFTER the action succeeds.
+
+**`if ((unsigned int)_hit_points <= amount)`**
+The cast to unsigned int prevents a signed/unsigned comparison warning. `_hit_points` is int (can be negative) but `amount` is unsigned int (can't be negative). The compiler warns when comparing these directly.
+
+---
+
+## 7. ScavTrap — inheriting and overriding
+
+**`class ScavTrap : public ClapTrap {`**
+The colon means "inherits from". `public` means ClapTrap's public stuff stays public in ScavTrap — it doesn't get hidden. If I wrote `private` instead, all inherited stuff would become private (almost never what I want).
+
+**`ScavTrap::ScavTrap(std::string name) : ClapTrap(name)`**
+The `: ClapTrap(name)` in the initializer list EXPLICITLY calls ClapTrap's constructor with the name. If I don't do this, C++ tries to call ClapTrap's DEFAULT (no-argument) constructor — which doesn't exist here, so it would fail.
+
+**`_hit_points = 100; _energy_points = 50; _attack_damage = 20;`**
+I can set these because they're "protected" in ClapTrap. If they were "private" this would be a compile error. This is why I had to change private to protected.
+
+**`ScavTrap(const ScavTrap &copy) : ClapTrap(copy)`**
+Copy constructor. The `: ClapTrap(copy)` calls ClapTrap's copy constructor to handle copying the parent's fields. I don't have to copy `_name` etc manually — the parent does it.
+
+**`ClapTrap::operator=(assign);`**
+Inside ScavTrap's `operator=`, I call the parent's `operator=` to copy the parent's fields. Then I'd copy ScavTrap-specific fields (but ScavTrap has none, so this is all I need).
+
+**`void ScavTrap::attack(const std::string &target)`**
+This OVERRIDES ClapTrap's attack(). When I call attack() on a ScavTrap object, THIS version runs instead of ClapTrap's. The function signatures must match exactly.
+
+**`void ScavTrap::guardGate()`**
+A brand new function that only ScavTrap has. ClapTrap doesn't know about this. I can only call it on ScavTrap objects (or classes that inherit from ScavTrap).
